@@ -23,7 +23,7 @@ from core.clis import Shell, MultilineShell
 from core.tcpserver import TcpServer
 import time
 import telnetlib
-import urlparse
+import urllib.parse
 import socket
 
 plugins = [
@@ -181,14 +181,14 @@ def check_template_injection(channel):
             log.info("""Delay is introduced appending '&& sleep <delay>' to the shell commands. True or False is returned whether it returns successfully or not.""")
 
             if channel.args.get('os_cmd'):
-                print current_plugin.execute_blind(channel.args.get('os_cmd'))
+                print(current_plugin.execute_blind(channel.args.get('os_cmd')))
             elif channel.args.get('os_shell'):
                 log.info('Run commands on the operating system.')
                 Shell(current_plugin.execute_blind, '%s (blind) $ ' % (channel.data.get('os', ''))).cmdloop()
 
         elif channel.data.get('execute'):
             if channel.args.get('os_cmd'):
-                print current_plugin.execute(channel.args.get('os_cmd'))
+                print(current_plugin.execute(channel.args.get('os_cmd')))
             elif channel.args.get('os_shell'):
                 log.info('Run commands on the operating system.')
 
@@ -210,7 +210,7 @@ def check_template_injection(channel):
                 call = current_plugin.render
 
             if channel.args.get('tpl_code'):
-                print call(channel.args.get('tpl_code'))
+                print(call(channel.args.get('tpl_code')))
             elif channel.args.get('tpl_shell'):
                 log.info('Inject multi-line template code. Press ctrl-D to send the lines')
                 MultilineShell(call, '%s > ' % (channel.data.get('engine', ''))).cmdloop()
@@ -258,7 +258,7 @@ def check_template_injection(channel):
 
         if channel.data.get('bind_shell'):
 
-            urlparsed = urlparse.urlparse(channel.base_url)
+            urlparsed = urllib.parse.urlparse(channel.base_url)
             if not urlparsed.hostname:
                 log.error("Error parsing hostname")
                 return

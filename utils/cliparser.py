@@ -153,14 +153,28 @@ parser.add_option_group(general)
 Dirty hack from sqlmap [1], to display longer options without breaking into two lines.
 [1] https://github.com/sqlmapproject/sqlmap/blob/fdc8e664dff305aca19acf143c7767b9a7626881/lib/parse/cmdline.py
 """
-def _(self, *args):
-    _ = parser.formatter._format_option_strings(*args)
-    if len(_) > 18:
-        _ = ("%%.%ds.." % (18 - parser.formatter.indent_increment)) % _
-    return _
 
-parser.formatter._format_option_strings = parser.formatter.format_option_strings
-parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser, type(parser))
+# Dirty hack to display longer options without breaking into two lines
+MAX_HELP_OPTION_LENGTH=18
+if hasattr(parser, "formatter"):
+    def _(self, *args):
+        retVal = parser.formatter._format_option_strings(*args)
+        if len(retVal) > MAX_HELP_OPTION_LENGTH:
+            retVal = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - parser.formatter.indent_increment)) % retVal
+        return retVal
+
+    parser.formatter._format_option_strings = parser.formatter.format_option_strings
+    parser.formatter.format_option_strings = type(parser.formatter.format_option_strings)(_, parser)
+else:
+    def _format_action_invocation(self, action):
+        retVal = self.__format_action_invocation(action)
+        if len(retVal) > MAX_HELP_OPTION_LENGTH:
+            retVal = ("%%.%ds.." % (MAX_HELP_OPTION_LENGTH - self._indent_increment)) % retVal
+        return retVal
+
+    parser.formatter_class.__format_action_invocation = parser.formatter_class._format_action_invocation
+    parser.formatter_class._format_action_invocation = _format_action_invocation
+
 
 option = parser.get_option("-h")
 option.help = option.help.capitalize().replace("Show this help message and exit", "Show help and exit.")

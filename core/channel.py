@@ -1,7 +1,7 @@
 import requests
 import urllib3
 from utils.loggers import log
-import urlparse
+import urllib.parse
 from copy import deepcopy
 import utils.config
 
@@ -69,7 +69,7 @@ class Channel:
         
     def _parse_url(self):
 
-        url_path = urlparse.urlparse(self.url).path
+        url_path = urllib.parse.urlparse(self.url).path
 
         if not self.tag in url_path:
             return
@@ -141,7 +141,7 @@ class Channel:
 
         if self.args.get('data'):
 
-            params_dict_list = urlparse.parse_qs(self.args.get('data'), keep_blank_values=True)
+            params_dict_list = urllib.parse.parse_qs(self.args.get('data'), keep_blank_values=True)
 
             for param, value_list in params_dict_list.items():
 
@@ -166,7 +166,7 @@ class Channel:
             
     def _parse_get(self, all_injectable = False):
 
-        params_dict_list = urlparse.parse_qs(urlparse.urlsplit(self.url).query, keep_blank_values=True)
+        params_dict_list = urllib.parse.parse_qs(urllib.parse.urlsplit(self.url).query, keep_blank_values=True)
 
         for param, value_list in params_dict_list.items():
 
